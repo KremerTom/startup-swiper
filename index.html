@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Idea Swiper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        .idea-card {
+            position: relative;
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.3s ease;
+        }
+
+        .idea-card:active {
+            cursor: grabbing;
+        }
+
+        .idea-card.swiping-right {
+            transform: translateX(100px) rotate(10deg);
+            opacity: 0.8;
+        }
+
+        .idea-card.swiping-left {
+            transform: translateX(-100px) rotate(-10deg);
+            opacity: 0.8;
+        }
+
+        .idea-pitch {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .idea-section {
+            margin-bottom: 1rem;
+        }
+
+        .idea-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .idea-text {
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .swipe-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .swipe-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reject-btn {
+            background: #ff4757;
+            color: white;
+        }
+
+        .reject-btn:hover {
+            background: #ff3742;
+            transform: scale(1.1);
+        }
+
+        .like-btn {
+            background: #2ed573;
+            color: white;
+        }
+
+        .like-btn:hover {
+            background: #26d65e;
+            transform: scale(1.1);
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            width: 40px;
+        }
+
+        .idea-summary {
+            flex: 1;
+            margin: 0 1rem;
+        }
+
+        .idea-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .score {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .no-more-ideas {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .nav {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .swipe-buttons {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💡 Startup Idea Swiper</h1>
+            <p>Submit your ideas, swipe on others, see what's hot!</p>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" onclick="showSection('submit')">Submit Idea</button>
+            <button class="nav-btn" onclick="showSection('swipe')">Swipe Ideas</button>
+            <button class="nav-btn" onclick="showSection('leaderboard')">Leaderboard</button>
+        </div>
+
+        <!-- Submit Section -->
+        <div id="submit-section" class="section active">
+            <div class="card">
+                <h2>Submit Your Startup Idea</h2>
+                <form id="ideaForm">
+                    <div class="form-group">
+                        <label for="pitch">One sentence elevator pitch *</label>
+                        <input type="text" id="pitch" name="pitch" required maxlength="200" placeholder="We help busy professionals...">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="problem">What's the problem you're solving? *</label>
+                        <textarea id="problem" name="problem" required placeholder="Describe the pain point..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="target">Who are you solving it for? *</label>
+                        <textarea id="target" name="target" required placeholder="Target customer segment..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="relevance">Why is this problem relevant today? *</label>
+                        <textarea id="relevance" name="relevance" required placeholder="What's changed recently..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="llm">Why is this easier/better now with LLMs? *</label>
+                        <textarea id="llm" name="llm" required placeholder="How do LLMs enable this solution..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tam">What's the TAM? *</label>
+                        <input type="text" id="tam" name="tam" required placeholder="e.g., $50B market, 100M potential users">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="validation">What's the first thing you would need to do to validate? *</label>
+                        <textarea id="validation" name="validation" required placeholder="First validation step..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="feature">What's the first feature you'd build? *</label>
+                        <textarea id="feature" name="feature" required placeholder="MVP feature..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-full">Submit Idea 🚀</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Swipe Section -->
+        <div id="swipe-section" class="section">
+            <div id="swipe-container">
+                <div id="no-ideas" class="card no-more-ideas" style="display: none;">
+                    <h3>🎉 You've reviewed all ideas!</h3>
+                    <p>Check back later for new submissions or submit your own idea.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div id="leaderboard-section" class="section">
+            <div class="card">
+                <h2>🏆 Top Ideas</h2>
+                <div id="leaderboard-content">
+                    <p style="text-align: center; color: #666; padding: 2rem;">No ideas have been rated yet. Start swiping!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API configuration
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : '';
+        let ideas = [];
+        let currentIdeaIndex = 0;
+        let swipedIdeas = JSON.parse(localStorage.getItem('swipedIdeas') || '[]');
+
+        // Navigation
+        function showSection(sectionName) {
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Show/hide sections
+            document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionName + '-section').classList.add('active');
+
+            if (sectionName === 'swipe') {
+                loadIdeas();
+                loadNextIdea();
+            } else if (sectionName === 'leaderboard') {
+                updateLeaderboard();
+            }
+        }
+
+        // Form submission
+        document.getElementById('ideaForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const idea = {
+                pitch: formData.get('pitch'),
+                problem: formData.get('problem'),
+                target: formData.get('target'),
+                relevance: formData.get('relevance'),
+                llm: formData.get('llm'),
+                tam: formData.get('tam'),
+                validation: formData.get('validation'),
+                feature: formData.get('feature')
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/ideas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(idea)
+                });
+
+                if (response.ok) {
+                    e.target.reset();
+                    alert('🎉 Your idea has been submitted! Check it out in the swipe section.');
+                } else {
+                    throw new Error('Failed to submit idea');
+                }
+            } catch (error) {
+                alert('❌ Error submitting idea. Please try again.');
+                console.error('Error:', error);
+            }
+        });
+
+        // Swipe functionality
+        function createIdeaCard(idea) {
+            return `
+                <div class="idea-card" data-idea-id="${idea.id}">
+                    <div class="idea-pitch">"${idea.pitch}"</div>
+                    
+                    <div class="idea-section">
+                        <div class="idea-label">Problem:</div>
+                        <div class="idea-text">${idea.problem}</div>
+                    </div>
+                    
+                    <div class="idea-section">
+                        <div class="idea-label">Target:</div>
+                        <div class="idea-text">${idea.target}</div>
+                    </div>
+                    
+                    <div class="idea-section">
+                        <div class="idea-label">Why now:</div>
+                        <div class="idea-text">${idea.relevance}</div>
+                    </div>
+                    
+                    <div class="idea-section">
+                        <div class="idea-label">LLM advantage:</div>
+                        <div class="idea-text">${idea.llm}</div>
+                    </div>
+                    
+                    <div class="idea-section">
+                        <div class="idea-label">TAM:</div>
+                        <div class="idea-text">${idea.tam}</div>
+                    </div>
+                    
+                    <div class="idea-section">
+                        <div class="idea-label">Validation:</div>
+                        <div class="idea-text">${idea.validation}</div>
+                    </div>
+                    
+                    <div class="idea-section">
+                        <div class="idea-label">First feature:</div>
+                        <div class="idea-text">${idea.feature}</div>
+                    </div>
+                    
+                    <div class="swipe-buttons">
+                        <button class="swipe-btn reject-btn" onclick="swipeIdea(${idea.id}, false)">👎</button>
+                        <button class="swipe-btn like-btn" onclick="swipeIdea(${idea.id}, true)">👍</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load ideas from API
+        async function loadIdeas() {
+            try {
+                const response = await fetch(`${API_BASE}/api/ideas`);
+                if (response.ok) {
+                    ideas = await response.json();
+                }
+            } catch (error) {
+                console.error('Error loading ideas:', error);
+            }
+        }
+
+        function loadNextIdea() {
+            const container = document.getElementById('swipe-container');
+            const noIdeasDiv = document.getElementById('no-ideas');
+            
+            // Filter out ideas that have already been swiped
+            const unswipedIdeas = ideas.filter(idea => !swipedIdeas.includes(idea.id));
+            
+            if (unswipedIdeas.length === 0) {
+                container.innerHTML = '';
+                noIdeasDiv.style.display = 'block';
+                return;
+            }
+            
+            noIdeasDiv.style.display = 'none';
+            const currentIdea = unswipedIdeas[currentIdeaIndex % unswipedIdeas.length];
+            container.innerHTML = createIdeaCard(currentIdea);
+        }
+
+        async function swipeIdea(ideaId, liked) {
+            // Add to swiped ideas locally
+            swipedIdeas.push(ideaId);
+            localStorage.setItem('swipedIdeas', JSON.stringify(swipedIdeas));
+            
+            // Send swipe to API
+            try {
+                await fetch(`${API_BASE}/api/swipe`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ ideaId, liked })
+                });
+            } catch (error) {
+                console.error('Error recording swipe:', error);
+            }
+            
+            // Visual feedback
+            const card = document.querySelector(`[data-idea-id="${ideaId}"]`);
+            if (card) {
+                card.classList.add(liked ? 'swiping-right' : 'swiping-left');
+                setTimeout(() => {
+                    currentIdeaIndex++;
+                    loadNextIdea();
+                }, 300);
+            }
+        }
+
+        async function updateLeaderboard() {
+            try {
+                const response = await fetch(`${API_BASE}/api/leaderboard`);
+                if (!response.ok) throw new Error('Failed to load leaderboard');
+                
+                const leaderboard = await response.json();
+                const content = document.getElementById('leaderboard-content');
+                
+                if (leaderboard.length === 0) {
+                    content.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No ideas have been rated yet. Start swiping!</p>';
+                    return;
+                }
+
+                content.innerHTML = leaderboard.map((idea, index) => `
+                    <div class="leaderboard-item">
+                        <div class="rank">#${index + 1}</div>
+                        <div class="idea-summary">
+                            <div class="idea-title">${idea.pitch}</div>
+                            <div style="font-size: 0.9rem; color: #666;">👍 ${idea.likes} • 👎 ${idea.dislikes}</div>
+                        </div>
+                        <div class="score">Score: ${idea.score}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+            }
+        }
+
+        // Initialize app
+        window.addEventListener('load', async () => {
+            await loadIdeas();
+        });
+    </script>
+</body>
+</html>
