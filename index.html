@@ -297,6 +297,135 @@
             display: block;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px 20px 0 0;
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            padding-right: 3rem;
+        }
+
+        .close {
+            position: absolute;
+            right: 1.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-label {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .modal-text {
+            color: #333;
+            line-height: 1.6;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .modal-stats {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .modal-stat {
+            text-align: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            flex: 1;
+        }
+
+        .modal-stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .modal-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 1rem;
@@ -393,6 +522,19 @@
                 <div id="leaderboard-content">
                     <p style="text-align: center; color: #666; padding: 2rem;">No ideas have been rated yet. Start swiping!</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for idea details -->
+    <div id="ideaModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Idea Details</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be populated by JavaScript -->
             </div>
         </div>
     </div>
@@ -581,7 +723,7 @@
                 }
 
                 content.innerHTML = leaderboard.map((idea, index) => `
-                    <div class="leaderboard-item">
+                    <div class="leaderboard-item" onclick="showIdeaDetails(${idea.id})" style="cursor: pointer;">
                         <div class="rank">#${index + 1}</div>
                         <div class="idea-summary">
                             <div class="idea-title">${idea.pitch}</div>
@@ -598,6 +740,97 @@
         // Initialize app
         window.addEventListener('load', async () => {
             await loadIdeas();
+        });
+
+        // Modal functionality
+        function showIdeaDetails(ideaId) {
+            const idea = ideas.find(i => i.id === ideaId);
+            if (!idea) return;
+
+            const modal = document.getElementById('ideaModal');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalBody = document.getElementById('modalBody');
+
+            modalTitle.textContent = idea.pitch;
+            
+            modalBody.innerHTML = `
+                <div class="modal-section">
+                    <span class="modal-label">Problem:</span>
+                    <div class="modal-text">${idea.problem || 'Not specified'}</div>
+                </div>
+                
+                <div class="modal-section">
+                    <span class="modal-label">Target Audience:</span>
+                    <div class="modal-text">${idea.target || 'Not specified'}</div>
+                </div>
+                
+                <div class="modal-section">
+                    <span class="modal-label">Why is this relevant today?</span>
+                    <div class="modal-text">${idea.relevance || 'Not specified'}</div>
+                </div>
+                
+                <div class="modal-section">
+                    <span class="modal-label">LLM Advantage:</span>
+                    <div class="modal-text">${idea.llm || 'Not specified'}</div>
+                </div>
+                
+                ${idea.tam ? `
+                <div class="modal-section">
+                    <span class="modal-label">Total Addressable Market (TAM):</span>
+                    <div class="modal-text">${idea.tam}</div>
+                </div>
+                ` : ''}
+                
+                ${idea.validation ? `
+                <div class="modal-section">
+                    <span class="modal-label">First Validation Step:</span>
+                    <div class="modal-text">${idea.validation}</div>
+                </div>
+                ` : ''}
+                
+                ${idea.feature ? `
+                <div class="modal-section">
+                    <span class="modal-label">First Feature to Build:</span>
+                    <div class="modal-text">${idea.feature}</div>
+                </div>
+                ` : ''}
+                
+                <div class="modal-stats">
+                    <div class="modal-stat">
+                        <span class="modal-stat-number">${idea.likes}</span>
+                        <span class="modal-stat-label">👍 Likes</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span class="modal-stat-number">${idea.dislikes}</span>
+                        <span class="modal-stat-label">👎 Dislikes</span>
+                    </div>
+                    <div class="modal-stat">
+                        <span class="modal-stat-number">${idea.score}</span>
+                        <span class="modal-stat-label">📊 Score</span>
+                    </div>
+                </div>
+            `;
+
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('ideaModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('ideaModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeModal();
+            }
         });
     </script>
 </body>
