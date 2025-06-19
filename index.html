@@ -500,6 +500,11 @@
                         <textarea id="feature" name="feature" placeholder="MVP feature... (optional)"></textarea>
                     </div>
 
+                    <div class="form-group">
+                        <label for="demo_url">URL to demo</label>
+                        <input type="url" id="demo_url" name="demo_url" placeholder="https://your-demo.com (optional)">
+                    </div>
+
                     <button type="submit" class="btn btn-full">Submit Idea 🚀</button>
                 </form>
             </div>
@@ -577,7 +582,8 @@
                 llm: formData.get('llm'),
                 tam: formData.get('tam'),
                 validation: formData.get('validation'),
-                feature: formData.get('feature')
+                feature: formData.get('feature'),
+                demo_url: formData.get('demo_url')
             };
 
             try {
@@ -792,6 +798,21 @@
                 <div class="modal-section">
                     <span class="modal-label">First Feature to Build:</span>
                     <div class="modal-text">${idea.feature}</div>
+                </div>
+                ` : ''}
+                
+                ${idea.demo_url ? `
+                <div class="modal-section">
+                    <span class="modal-label">Demo:</span>
+                    <div class="modal-text">
+                        <a href="${idea.demo_url}" target="_blank" rel="noopener noreferrer" 
+                           style="color: #667eea; text-decoration: none; font-weight: 600;">
+                            🔗 View Demo
+                        </a>
+                        <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                            ${idea.demo_url}
+                        </div>
+                    </div>
                 </div>
                 ` : ''}
                 

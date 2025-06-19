@@ -41,7 +41,8 @@ export default async function handler(req, res) {
             llm: req.body.llm,
             tam: req.body.tam,
             validation: req.body.validation,
-            feature: req.body.feature
+            feature: req.body.feature,
+            demo_url: req.body.demo_url
           }])
           .select()
         
